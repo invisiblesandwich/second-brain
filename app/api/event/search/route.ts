@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
 
     const searchResults = await prisma.event.findMany({
       where: {
-        userId: auth?.userId,
+        userId: auth.userId,
         OR: [
           {
             title: {
@@ -66,7 +66,7 @@ export async function GET(req: NextRequest) {
             },
           },
           {
-            content: {
+            description: {
               contains: q,
               mode: "insensitive",
             },
