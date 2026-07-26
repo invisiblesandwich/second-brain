@@ -1,6 +1,6 @@
 import { getAuthUser } from "@/lib/auth";
 import { embedItem } from "@/lib/embedItem";
-import { invalidateDashboardInsight } from "@/lib/invalidateDashboardInsight";
+
 import { prisma } from "@/lib/prisma";
 import { eventSchema } from "@/lib/validations";
 import { NextRequest, NextResponse } from "next/server";
@@ -135,7 +135,6 @@ export async function PUT(req: NextRequest, { params }: RouterContext) {
     ).catch((err) =>
       console.error("Embedding failed for event", updatedEvent.id, err),
     );
-    await invalidateDashboardInsight(auth.userId);
 
     return NextResponse.json(
       {
@@ -201,8 +200,6 @@ export async function DELETE(req: NextRequest, { params }: RouterContext) {
         id,
       },
     });
-
-    await invalidateDashboardInsight(auth.userId);
 
     return NextResponse.json(
       {

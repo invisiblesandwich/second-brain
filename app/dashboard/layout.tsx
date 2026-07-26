@@ -1,6 +1,5 @@
 "use client";
 
-import AiSidebar from "@/component/layout/AiSidebar";
 import Sidebar from "@/component/layout/Sidebar";
 import { useEffect, useState } from "react";
 

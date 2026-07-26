@@ -29,6 +29,7 @@ interface DashboardGridProps {
   onOpenEvent: (id: string) => void;
   onEditEvent: (id: string) => void;
   onDeleteEvent: (id: string) => void;
+  generateInsight: () => void;
 }
 
 export default function DashboardGrid({
@@ -45,6 +46,7 @@ export default function DashboardGrid({
   onOpenEvent,
   onEditEvent,
   onDeleteEvent,
+  generateInsight,
 }: DashboardGridProps) {
   return (
     <div className="grid gap-6 xl:grid-cols-2">
@@ -99,22 +101,52 @@ export default function DashboardGrid({
       {/* AI Card */}
 
       <DashboardCard
-        title="AI Insights"
-        description="Powered by your Second Brain"
+        title="AI Assistant"
+        description="Insights generated from your Second Brain"
         icon={Sparkles}
       >
-        <div className="space-y-4">
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900 p-4">
-            <h3 className="font-medium text-white">Today's Suggestion</h3>
-            {insight.length > 0 ? (
-              <p className="mt-2 text-sm text-zinc-400">{insight}</p>
-            ) : (
-              <p className="mt-2 text-sm text-zinc-400">
-                You have unfinished tasks and upcoming events today. Consider
-                reviewing your latest notes before starting.
+        <div className="flex h-full flex-col gap-4">
+          {insight ? (
+            <>
+              <div className="rounded-2xl border border-violet-500/20 bg-gradient-to-br from-violet-500/10 to-zinc-900 p-5">
+                <div className="mb-3 flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-violet-400" />
+                  <h3 className="font-semibold text-white">Today's Insight</h3>
+                </div>
+
+                <p className="whitespace-pre-wrap text-sm leading-7 text-zinc-300">
+                  {insight}
+                </p>
+              </div>
+
+              <button
+                onClick={generateInsight}
+                className="mt-auto rounded-xl border border-zinc-700 py-2 text-sm font-medium text-zinc-300 transition hover:border-violet-500 hover:bg-violet-500/10 hover:text-violet-300"
+              >
+                ✨ Regenerate Insight
+              </button>
+            </>
+          ) : (
+            <div className="flex flex-1 flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/50 px-6 py-10 text-center">
+              <Sparkles className="mb-4 h-10 w-10 text-violet-400" />
+
+              <h3 className="text-lg font-semibold text-white">
+                No Insight Yet
+              </h3>
+
+              <p className="mt-2 max-w-sm text-sm leading-6 text-zinc-400">
+                Generate an AI summary of your recent notes, today's tasks, and
+                upcoming events whenever you need it.
               </p>
-            )}
-          </div>
+
+              <button
+                onClick={generateInsight}
+                className="mt-6 rounded-xl bg-violet-600 px-5 py-2.5 font-medium text-white transition hover:bg-violet-500"
+              >
+                ✨ Generate Insight
+              </button>
+            </div>
+          )}
         </div>
       </DashboardCard>
     </div>

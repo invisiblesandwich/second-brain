@@ -12,13 +12,16 @@ export default function useDashboard() {
   const [notes, setNotes] = useState<Note[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
-  const [insight,setInsight]=useState("");
+
+  const [insight, setInsight] = useState("");
+  const [hasInsight, setHasInsight] = useState(false);
 
   const [notesCount, setNotesCount] = useState(0);
   const [tasksCount, setTasksCount] = useState(0);
   const [eventsCount, setEventsCount] = useState(0);
 
   const [loading, setLoading] = useState(true);
+  const [insightLoading, setInsightLoading] = useState(false);
 
   useEffect(() => {
     fetchDashboard();
@@ -36,8 +39,8 @@ export default function useDashboard() {
       setEvents(res.data.todayEvents ?? []);
 
       setNotesCount(res.data.stats.notes);
-      setEventsCount(res.data.stats.events);
       setTasksCount(res.data.stats.tasks);
+      setEventsCount(res.data.stats.events);
     } catch (error) {
       console.error("Dashboard fetch failed:", error);
     } finally {
@@ -47,30 +50,58 @@ export default function useDashboard() {
 
   async function fetchInsight() {
     try {
-      setLoading(true)
+      setInsightLoading(true);
 
-      const res=await api.get("/ai/insight")
-     
+      const res = await api.get("/ai/insight");
+
+      if (res.data.insight) {
+        setInsight(res.data.insight);
+        setHasInsight(true);
+      } else {
+        setInsight("");
+        setHasInsight(false);
+      }
+    } catch (error) {
+      console.error("Insight fetch failed:", error);
+      setInsight("");
+      setHasInsight(false);
+    } finally {
+      setInsightLoading(false);
+    }
+  }
+
+  async function generateInsight() {
+    try {
+      setInsightLoading(true);
+      console.log("hii");
+      const res = await api.post("/ai/insight");
 
       setInsight(res.data.insight);
-      
-    }catch (error) {
-      console.error("Insite fetch failed:", error);
+      setHasInsight(true);
+    } catch (error) {
+      console.error("Insight generation failed:", error);
     } finally {
-      setLoading(false);
+      setInsightLoading(false);
     }
   }
 
   return {
     loading,
+    insightLoading,
+
     notes,
     tasks,
     events,
+
     notesCount,
     tasksCount,
     eventsCount,
+
     insight,
+    hasInsight,
+
     fetchDashboard,
     fetchInsight,
+    generateInsight,
   };
 }

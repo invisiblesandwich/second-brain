@@ -1,6 +1,6 @@
 import { getAuthUser } from "@/lib/auth";
 import { embedItem } from "@/lib/embedItem";
-import { invalidateDashboardInsight } from "@/lib/invalidateDashboardInsight";
+
 import { prisma } from "@/lib/prisma";
 import { eventSchema } from "@/lib/validations";
 import { NextRequest, NextResponse } from "next/server";
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     embedItem("event", newEvent.id, `${title}\n${description}`).catch((err) =>
       console.error("Embedding failed for event", newEvent.id, err),
     );
-    await invalidateDashboardInsight(auth.userId);
+
 
     return NextResponse.json(
       {

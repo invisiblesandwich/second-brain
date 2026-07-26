@@ -1,6 +1,6 @@
 import { getAuthUser } from "@/lib/auth";
 import { embedItem } from "@/lib/embedItem";
-import { invalidateDashboardInsight } from "@/lib/invalidateDashboardInsight";
+
 import { prisma } from "@/lib/prisma";
 
 import { taskSchema } from "@/lib/validations";
@@ -136,7 +136,7 @@ export async function PUT(req: NextRequest, { params }: RouterContext) {
     ).catch((err) =>
       console.error("Embedding failed for task", updatedTask.id, err),
     );
-    await invalidateDashboardInsight(auth.userId);
+
     return NextResponse.json(
       {
         success: true,
@@ -201,7 +201,6 @@ export async function DELETE(req: NextRequest, { params }: RouterContext) {
         id,
       },
     });
-    await invalidateDashboardInsight(auth.userId);
 
     return NextResponse.json(
       {

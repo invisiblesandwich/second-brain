@@ -9,7 +9,7 @@ const client = new HfInference(process.env.HUGGING_FACE_TOKEN);
 
 const MODEL = "meta-llama/Llama-3.1-8B-Instruct";
 
-export async function GET() {
+export async function POST() {
   try {
     const auth = await getAuthUser();
 
@@ -19,51 +19,36 @@ export async function GET() {
           success: false,
           message: "Unauthorized",
         },
-        {
-          status: 401,
-        },
+        { status: 401 }
       );
     }
 
-    const cached = await prisma.dashboardInsight.findUnique({
-      where: {
-        userId: auth.userId,
-      },
-    });
-
-    if (cached) {
-      return NextResponse.json({
-        success: true,
-        insight: cached.insight,
-        cached: true,
-      });
-    }
-
-    const { recentNotes, todayTasks, todayEvents } = await getDashboardContext(
-      auth.userId,
-    );
+    const { recentNotes, todayTasks, todayEvents } =
+      await getDashboardContext(auth.userId);
 
     const prompt = `
 You are the AI assistant for a Second Brain application.
 
 Recent Notes:
 ${
-  recentNotes.length > 0
+  recentNotes.length
     ? recentNotes
-        .map((note) => `• ${note.title}\n${note.content.slice(0, 250)}`)
+        .map(
+          (n) => `• ${n.title}
+${n.content.slice(0, 250)}`
+        )
         .join("\n\n")
     : "No recent notes."
 }
 
 Today's Tasks:
 ${
-  todayTasks.length > 0
+  todayTasks.length
     ? todayTasks
         .map(
-          (task) =>
-            `• ${task.title}
-Status: ${task.status}
-Description: ${task.description}`,
+          (t) => `• ${t.title}
+Status: ${t.status}
+Description: ${t.description}`
         )
         .join("\n\n")
     : "No tasks today."
@@ -71,29 +56,28 @@ Description: ${task.description}`,
 
 Today's Events:
 ${
-  todayEvents.length > 0
+  todayEvents.length
     ? todayEvents
         .map(
-          (event) =>
-            `• ${event.title}
-${event.description}
-${new Date(event.startTime).toLocaleTimeString()} - ${new Date(event.endTime).toLocaleTimeString()}`,
+          (e) => `• ${e.title}
+${e.description}
+${new Date(e.startTime).toLocaleTimeString()} - ${new Date(
+            e.endTime
+          ).toLocaleTimeString()}`
         )
         .join("\n\n")
     : "No events today."
 }
 
-Generate a "Today's Insight".
+Generate Today's Insight.
 
-Requirements:
-
+Rules:
 - Maximum 120 words.
 - Mention today's highest priority.
 - Mention today's events.
-- Mention if a note can help complete a task.
+- Mention if a note helps complete a task.
 - Mention scheduling conflicts if any.
 - Finish with one productivity suggestion.
-- Use a friendly tone.
 `;
 
     const result = await client.chatCompletion({
@@ -143,7 +127,33 @@ Requirements:
       },
       {
         status: 500,
-      },
+      }
     );
   }
+}
+
+
+export async function GET() {
+  const auth = await getAuthUser();
+
+  if (!auth) {
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unauthorized",
+      },
+      { status: 401 }
+    );
+  }
+
+  const insight = await prisma.dashboardInsight.findUnique({
+    where: {
+      userId: auth.userId,
+    },
+  });
+
+  return NextResponse.json({
+    success: true,
+    insight: insight?.insight ?? null,
+  });
 }

@@ -1,10 +1,9 @@
 import "dotenv/config";
 import { HfInference, PROVIDERS } from "@huggingface/inference";
 
-const client = new HfInference(process.env.HUGGINGFACE_API_KEY);
+const client = new HfInference(process.env.HUGGING_FACE_TOKEN);
 
 const EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2";
-
 
 export async function getEmbedding(text: string): Promise<number[]> {
   const result = await client.featureExtraction({

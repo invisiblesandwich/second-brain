@@ -26,6 +26,7 @@ export default function DashboardPage() {
 
       <DashboardGrid
         insight={dashboard.insight}
+        generateInsight={dashboard.generateInsight}
         notes={dashboard.notes.slice(0, 5)}
         tasks={dashboard.tasks.slice(0, 5)}
         events={dashboard.events.slice(0, 5)}

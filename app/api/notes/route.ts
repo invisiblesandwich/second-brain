@@ -1,6 +1,6 @@
 import { getAuthUser } from "@/lib/auth";
 import { embedItem } from "@/lib/embedItem";
-import { invalidateDashboardInsight } from "@/lib/invalidateDashboardInsight";
+
 import { prisma } from "@/lib/prisma";
 import { notesSchema } from "@/lib/validations";
 import { NextRequest, NextResponse } from "next/server";
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       console.error("Embedding failed for note", NewNotes.id, err),
     );
 
-    await invalidateDashboardInsight(auth.userId);
+
 
     return NextResponse.json(
       {
